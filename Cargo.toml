@@ -1,0 +1,13 @@
+[package]
+name = "tebindgen"
+version = "0.1.0"
+authors = ["Daniel Shiposha <shipdan@yandex.ru>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clang = { version = "0.23", features = ["clang_8_0"]  }
+quote = "1.0"
+proc-macro2 = "1.0"
+lazy_static = "1.4"
