@@ -1,11 +1,11 @@
 extern crate proc_macro2;
 
-use std::fs;
 use std::path::Path;
 
 #[derive(Debug)]
 pub enum Symbol<'a> {
-    Function(FnSignature<'a>)
+    Function(FnSignature<'a>),
+    Struct(Struct<'a>)
 }
 
 #[derive(Debug)]
@@ -19,6 +19,12 @@ pub struct FnSignature<'a> {
     name: String,
     ctype: clang::Type<'a>,
     parameters: Vec<FnParameter<'a>>
+}
+
+#[derive(Debug)]
+pub struct Struct<'a> {
+    name: String,
+    ctype: clang::Type<'a>
 }
 
 #[derive(Debug)]
@@ -65,6 +71,10 @@ impl<'a> FnSignature<'a> {
     pub fn parameters(&self) -> &Vec<FnParameter<'a>> {
         &self.parameters
     }
+
+    pub fn result_type(&self) -> clang::Type<'a> {
+        self.ctype().get_result_type().unwrap()
+    }
 }
 
 impl TranslationUnit {
@@ -92,7 +102,4 @@ impl TranslationUnit {
     pub fn tokens(&self) -> &proc_macro2::TokenStream {
         &self.tokens
     }
-
-    // pub fn write_to_file<T: AsRef<Path>>(out_file: T) {
-    // }
 }
