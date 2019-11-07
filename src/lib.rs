@@ -298,13 +298,53 @@ impl Generator {
 
     fn generate_var<Gen>(
         &mut self,
-        _var_decl: clang::Entity,
-        _user_gen: &Gen,
+        var_decl: clang::Entity,
+        user_gen: &Gen,
     ) -> Option<proc_macro2::TokenStream>
     where
         Gen: Fn(ir::Symbol) -> Option<proc_macro2::TokenStream>,
     {
-        unimplemented!();
+        let var_name = var_decl.get_name().unwrap();
+        let var_type = var_decl.get_type().unwrap();
+
+        if self.symbols.contains(&var_name) {
+            return None;
+        }
+
+        let is_exported = {
+            #[cfg(target_family = "unix")]
+            {
+                match var_decl.get_visibility() {
+                    Some(v) => v == clang::Visibility::Default,
+                    None => false,
+                }
+            }
+
+            #[cfg(target_family = "windows")]
+            {
+                var_decl
+                    .get_children()
+                    .iter()
+                    .find(|&child| child.get_kind() == clang::EntityKind::DllExport)
+                    .is_some()
+            }
+
+            #[cfg(all(not(target_family = "unix"), not(target_family = "windows")))]
+            {
+                unimplemented!()
+            }
+        };
+
+        if is_exported {
+            self.symbols.insert(var_name.clone());
+
+            let var = ir::Variable::new(var_name, var_type);
+            let symbol = ir::Symbol::Variable(var);
+
+            user_gen(symbol)
+        } else {
+            None
+        }
     }
 }
 
@@ -365,7 +405,7 @@ mod tests {
         }};
     }
 
-    macro_rules! check_struct_symbol {
+    macro_rules! check_struct {
         ($struc:expr => $struct_name:ident {
             $($fields:tt)*
         }) => {{
@@ -398,6 +438,16 @@ mod tests {
                         assert_eq!(field.ctype().get_display_name(), fields_types[i]);
                     });
             }
+        }};
+    }
+
+    macro_rules! check_var_symbol {
+        ($var:expr => $var_name:ident: $($var_type:tt)+) => {{
+            let var_name = stringify![$var_name];
+            let var_type = stringify![$($var_type)+];
+
+            assert_eq!($var.name(), var_name);
+            assert_eq!($var.ctype().get_display_name(), var_type);
         }};
     }
 
@@ -480,17 +530,17 @@ mod tests {
                 generate_struct_gen(symbol): match symbol {
                     ir::Symbol::Struct(decl) => {
                         match decl.name() {
-                            "Empty" => check_struct_symbol![decl => Empty {}],
-                            "Fields" => check_struct_symbol![decl => Fields {
+                            "Empty" => check_struct![decl => Empty {}],
+                            "Fields" => check_struct![decl => Fields {
                                 a: int,
                                 b: const double *
                             }],
-                            "Forward" => check_struct_symbol![decl => Forward {}],
+                            "Forward" => check_struct![decl => Forward {}],
                             "FwdFields" => {
                                 if decl.fields().is_empty() {
                                     return None;
                                 } else {
-                                    check_struct_symbol![decl => FwdFields {
+                                    check_struct![decl => FwdFields {
                                         some: int
                                     }];
                                 }
@@ -504,6 +554,23 @@ mod tests {
         );
 
         assert_generator_called![units, generate_struct_gen];
+    }
+
+    #[test]
+    fn test_generate_var() {
+        let generate_var_test_dir = DATA.clone().as_path().join("generate_var_test");
+
+        let units = Generator::new().generate(
+            generate_var_test_dir,
+            test_generator! {
+                generate_var_gen(symbol): match symbol {
+                    ir::Symbol::Variable(var) => check_var_symbol![var => test_var: const char *],
+                    _ => {}
+                }
+            },
+        );
+
+        assert_generator_called![units, generate_var_gen];
     }
 
     #[test]
