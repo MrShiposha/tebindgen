@@ -17,12 +17,6 @@ pub struct FnSignature<'a> {
 }
 
 #[derive(Debug)]
-pub struct FnParameter<'a> {
-    name: String,
-    ctype: clang::Type<'a>,
-}
-
-#[derive(Debug)]
 pub struct Struct<'a> {
     name: String,
     ctype: clang::Type<'a>,
@@ -36,6 +30,7 @@ pub struct Variable<'a> {
 }
 
 pub type StructField<'a> = Variable<'a>;
+pub type FnParameter<'a> = Variable<'a>;
 
 #[derive(Debug)]
 pub struct TranslationUnit {
@@ -70,20 +65,6 @@ impl<'a> FnSignature<'a> {
 
     pub fn result_type(&self) -> clang::Type<'a> {
         self.ctype().get_result_type().unwrap()
-    }
-}
-
-impl<'a> FnParameter<'a> {
-    pub fn new(name: String, ctype: clang::Type<'a>) -> FnParameter<'a> {
-        FnParameter { name, ctype }
-    }
-
-    pub fn name(&self) -> &str {
-        self.name.as_str()
-    }
-
-    pub fn ctype(&self) -> &clang::Type<'a> {
-        &self.ctype
     }
 }
 
