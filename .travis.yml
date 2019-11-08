@@ -1,0 +1,9 @@
+language: rust
+rust:
+  - stable
+  - nightly
+  - beta
+jobs:
+  allow_failures:
+    - rust: beta
+cache: cargo
