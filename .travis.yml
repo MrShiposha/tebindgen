@@ -9,3 +9,6 @@ jobs:
 cache: cargo
 before_install:
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib
+notifications:
+  email:
+    on_success: never
