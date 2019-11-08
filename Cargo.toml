@@ -1,7 +1,10 @@
 [package]
 name = "tebindgen"
 version = "0.1.0"
-authors = ["Daniel Shiposha <shipdan@yandex.ru>"]
+authors = ["Daniel Shiposha <mrshiposha@gmail.com>"]
+repository = "https://github.com/MrShiposha/tebindgen.git"
+homepage = "https://github.com/MrShiposha/tebindgen"
+license = "MIT"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
