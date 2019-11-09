@@ -13,23 +13,6 @@ use std::path::Path;
 
 mod ir;
 
-macro_rules! is_default_visibility {
-    ($visibility:expr) => {{
-        #[cfg(target_family = "unix")]
-        {
-            match $visibility {
-                Some(v) => v == clang::Visibility::Default,
-                None => false,
-            }
-        }
-
-        #[cfg(not(target_family = "unix"))]
-        {
-            false
-        }
-    }};
-}
-
 type SymbolName = String;
 type StructName = String;
 type HasFields = bool;
@@ -220,7 +203,20 @@ impl Generator {
         }
 
         #[allow(unused_mut)]
-        let mut is_exported = is_default_visibility![fn_decl.get_visibility()];
+        let mut is_exported = {
+            #[cfg(target_family = "unix")]
+            {
+                match fn_decl.get_visibility() {
+                    Some(v) => v == clang::Visibility::Default,
+                    None => false,
+                }
+            }
+
+            #[cfg(not(target_family = "unix"))]
+            {
+                false
+            }
+        };
 
         for child in fn_decl.get_children() {
             #[allow(clippy::single_match)]
@@ -266,8 +262,6 @@ impl Generator {
             return None;
         }
 
-        #[allow(unused_mut)]
-        let mut is_exported = is_default_visibility![struct_decl.get_visibility()];
         for child in struct_decl.get_children() {
             #[allow(clippy::single_match)]
             match child.get_kind() {
@@ -276,24 +270,17 @@ impl Generator {
                         ir::StructField::new(child.get_name().unwrap(), child.get_type().unwrap());
 
                     fields.push(field);
-                }
-
-                #[cfg(target_family = "windows")]
-                clang::EntityKind::DllExport => is_exported = true,
+                },
                 _ => {}
             }
         }
 
-        if is_exported {
-            self.structs.insert(struct_name.clone(), !fields.is_empty());
+        self.structs.insert(struct_name.clone(), !fields.is_empty());
 
-            let struct_obj = ir::Struct::new(struct_name, struct_type, fields);
-            let symbol = ir::Symbol::Struct(struct_obj);
+        let struct_obj = ir::Struct::new(struct_name, struct_type, fields);
+        let symbol = ir::Symbol::Struct(struct_obj);
 
-            user_gen(symbol)
-        } else {
-            None
-        }
+        user_gen(symbol)
     }
 
     fn generate_var<Gen>(

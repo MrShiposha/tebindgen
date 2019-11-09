@@ -1,7 +1,7 @@
 #ifndef _API_H_
 #define _API_H_
 
-#ifdef MSVC
+#ifdef _WIN32
 #   define API __declspec(dllexport)
 #   define HIDDEN
 #else
