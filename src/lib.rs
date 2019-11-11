@@ -84,6 +84,13 @@ impl Generator {
         self
     }
 
+    pub fn c_flags<T: AsRef<str>>(&mut self, flags: &[T]) -> &mut Self {
+        let mut flags: Vec<String> = flags.iter().map(|f| String::from(f.as_ref())).collect();
+        self.arguments.append(&mut flags);
+
+        self
+    }
+
     pub fn include_directory<T: AsRef<Path>>(&mut self, dir: T) -> &mut Self {
         let dir = dir
             .as_ref()
@@ -599,6 +606,21 @@ mod tests {
         );
 
         assert_generator_called![units, define_gen];
+    }
+
+    #[test]
+    fn test_clear_arguments_and_cflags() {
+        let mut generator = Generator::new();
+
+        assert!(generator.arguments.is_empty());
+        generator.c_flags(&["some_flag1", "some_flag2"]);
+        
+        assert!(!generator.arguments.is_empty());
+        assert_eq!(generator.arguments[0], "some_flag1");
+        assert_eq!(generator.arguments[1], "some_flag2");
+
+        generator.clear_arguments();
+        assert!(generator.arguments.is_empty());
     }
 
     #[test]
