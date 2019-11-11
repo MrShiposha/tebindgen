@@ -3,12 +3,55 @@ rust:
   - stable
   - nightly
   - beta
-jobs:
-  allow_failures:
-    - rust: beta
 cache: cargo
+
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
+      - libiberty-dev
+      - gcc
+      - cmake # required for cargo-update
+    sources:
+      - kalakris-cmake
+
 before_install:
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib
+  # Required for running tests (for libclang.so)
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
+
+before_script:
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install-update -a # update outdated cached binaries
+  
+  # Install kcov.
+  - echo "Installing kcov"
+  - wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz
+  - tar xzf master.tar.gz
+  - cd kcov-master
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+  - cd ../..
+  - echo "kcov installed"
+  - rm -rf kcov-master
+
+  # Install cargo-kcov
+  - echo "Installing cargo-kcov"
+  - cargo install cargo-kcov 2>/dev/null || echo "cargo-kcov already installed"
+  
+script:
+  - |
+      cargo build &&
+      cargo test
+
+after_success:
+  - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
+
 notifications:
   email:
     on_success: never
