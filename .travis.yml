@@ -18,9 +18,6 @@ before_install:
   - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
 
-before_script:
-  - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
-
 matrix:
   allow_failures:
     - rust: nightly
@@ -29,6 +26,7 @@ matrix:
       - stable
       - beta
       before_script:
+        - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
         - rustup component add clippy
         - rustup component add rustfmt
       script:
@@ -40,6 +38,7 @@ matrix:
 
     - rust: nightly
       before_script:
+        - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
         - rustup component add clippy --toolchain nightly || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy
         - rustup component add rustfmt --toolchain nightly
       script:
