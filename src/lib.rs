@@ -645,21 +645,4 @@ mod tests {
 
         assert_generator_called![units, define_value_gen];
     }
-
-    #[test]
-    fn test_hidden() {
-        let hidden_test_dir = DATA.clone().as_path().join("hidden");
-
-        let units = Generator::new()
-            .generate(
-                hidden_test_dir,
-                test_generator! {
-                    hidden_gen(_symbol): assert!(false, "This must never be called");
-                },
-            );
-
-        assert_eq!(units.len(), 2);
-        assert!(units[0].tokens().to_string().is_empty());
-        assert!(units[1].tokens().to_string().is_empty());
-    }
 }
