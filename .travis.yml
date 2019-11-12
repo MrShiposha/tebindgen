@@ -22,6 +22,8 @@ before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
 
 matrix:
+  allow_failures:
+    - rust: nightly
   include:
     - rust:
       - stable
