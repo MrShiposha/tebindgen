@@ -22,7 +22,6 @@ before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
   - rustup component add clippy || true
   - rustup component add rustfmt || true
-  - cargo fmt -- --check
 
 matrix:
   include:
@@ -30,6 +29,7 @@ matrix:
       - stable
       - beta
       script:
+        - cargo fmt -- --check
         - |
             cargo build &&
             cargo test &&
@@ -37,6 +37,7 @@ matrix:
 
     - rust: nightly
       script:
+        - cargo fmt -- --check
         - |
             cargo build &&
             cargo test
