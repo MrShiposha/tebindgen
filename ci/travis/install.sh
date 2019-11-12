@@ -19,8 +19,3 @@ rm -rf kcov-master
   # Install cargo-kcov
 echo "Installing cargo-kcov"
 cargo install cargo-kcov 2>/dev/null || echo "cargo-kcov already installed"
-
-  # Install clippy (or do nothing for nightly channel)
-rustup component add clippy || 
-rustup component add clippy --toolchain=nightly || 
-cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy

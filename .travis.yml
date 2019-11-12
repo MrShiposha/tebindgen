@@ -13,26 +13,41 @@ addons:
     sources:
       - kalakris-cmake
 
-rust:
-  - stable
-  - beta
-  - nightly
-before_install:
-  # Required for running tests (for libclang.so)
-  - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
-before_script:
-  - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
-script:
-  - echo $LD_LIBRARY_PATH
-  - |
-      cargo build &&
-      cargo test
-  - cargo clippy
-    
-after_success:
-  - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
-
+matrix:
+  - include:
+    - rust:
+      - stable
+      - beta
+      before_install:
+        # Required for running tests (for libclang.so)
+        - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
+        - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
+      before_script:
+        - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
+        - rustup component add clippy
+      script:
+        - |
+            cargo build &&
+            cargo test
+        - cargo clippy
+          
+      after_success:
+        - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
+    - rust: nightly
+      before_install:
+        # Required for running tests (for libclang.so)
+        - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
+        - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
+      before_script:
+        - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
+      script:
+        - |
+            cargo build &&
+            cargo test
+          
+      after_success:
+        - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
+        
 notifications:
   email:
     on_success: never
