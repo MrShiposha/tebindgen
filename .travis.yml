@@ -42,11 +42,15 @@ before_script:
   # Install cargo-kcov
   - echo "Installing cargo-kcov"
   - cargo install cargo-kcov 2>/dev/null || echo "cargo-kcov already installed"
+
+  # Install clippy
+  - rustup component add clippy
   
 script:
   - |
       cargo build &&
       cargo test
+  - cargo clippy -- -D clippy::all
 
 after_success:
   - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
