@@ -213,9 +213,8 @@ impl Generator {
         let mut is_exported = {
             #[cfg(target_family = "unix")]
             {
-                match fn_decl.get_visibility() {
-                    Some(v) => v == clang::Visibility::Default,
-                    None => false,
+                if let Some(v) = fn_decl.get_visibility() {
+                    v == clang::Visibility::Default
                 }
             }
 
@@ -308,9 +307,8 @@ impl Generator {
         let is_exported = {
             #[cfg(target_family = "unix")]
             {
-                match var_decl.get_visibility() {
-                    Some(v) => v == clang::Visibility::Default,
-                    None => false,
+                if let Some(v) = var_decl.get_visibility() {
+                    v == clang::Visibility::Default
                 }
             }
 
