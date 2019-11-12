@@ -19,8 +19,8 @@ rust:
   - nightly
 before_install:
   # Required for running tests (for libclang.so)
+  - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
-  - bash $TRAVIS_BUILD_DIR/ci/travis/before_install.sh
 before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
 script:
