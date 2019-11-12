@@ -21,6 +21,7 @@ before_install:
 before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
   - rustup component add clippy || true
+  - cargo fmt -- --check
 
 matrix:
   include:
