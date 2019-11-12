@@ -1,3 +1,5 @@
+#![deny(clippy::all)]
+
 extern crate proc_macro2;
 
 use std::path::Path;
