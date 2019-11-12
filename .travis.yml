@@ -17,7 +17,7 @@ before_install:
   # Required for running tests (for libclang.so)
   - chmod -R +x $TRAVIS_BUILD_DIR/ci/travis
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/clang-7.0.0/lib:target/debug/deps
-  
+
 before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
   - rustup component add clippy || true
@@ -30,8 +30,8 @@ matrix:
       script:
         - |
             cargo build &&
-            cargo test
-        - cargo clippy
+            cargo test &&
+            cargo clippy
 
     - rust: nightly
       script:
