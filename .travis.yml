@@ -22,6 +22,7 @@ before_install:
 before_script:
   - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
 script:
+  - echo $LD_LIBRARY_PATH
   - |
       cargo build &&
       cargo test
