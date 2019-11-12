@@ -456,24 +456,21 @@ mod tests {
     }
 
     macro_rules! assert_generator_called {
-        ($units:expr, $generator_name:ident) => {{
+        ($units:expr, $generator_name:ident($calls_count:expr)) => {{
             assert!{
                 $units.len() > 0,
                 "No files processed. Please assign DATA variable correct path to res/test folder"
             };
 
-            for (i, unit) in $units.iter().enumerate() {
-                let tokens = unit.tokens().to_string();
-                let expected = quote!($generator_name called).to_string();
+            let called = $units.iter()
+                .map(|unit| unit.tokens())
+                .filter(|tokens| {
+                    let expected = quote!($generator_name called).to_string();
+                    tokens.to_string() == expected
+                })
+                .collect::<Vec<_>>();
 
-                assert!{
-                    tokens == expected,
-                    "Unit {} has invalid tokens. \n\tExpected: `{}`\n\tActual: `{}`",
-                    i,
-                    expected,
-                    tokens
-                };
-            }
+            assert_eq!(called.len(), $calls_count);
         }};
     }
 
@@ -511,7 +508,7 @@ mod tests {
             },
         );
 
-        assert_generator_called![units, generate_fn_gen];
+        assert_generator_called![units, generate_fn_gen(3)];
     }
 
     #[test]
@@ -547,7 +544,7 @@ mod tests {
             },
         );
 
-        assert_generator_called![units, generate_struct_gen];
+        assert_generator_called![units, generate_struct_gen(4)];
     }
 
     #[test]
@@ -564,7 +561,7 @@ mod tests {
             },
         );
 
-        assert_generator_called![units, generate_var_gen];
+        assert_generator_called![units, generate_var_gen(1)];
     }
 
     #[test]
@@ -585,7 +582,7 @@ mod tests {
             },
         );
 
-        assert_generator_called![units, include_gen];
+        assert_generator_called![units, include_gen(1)];
     }
 
     #[test]
@@ -605,7 +602,7 @@ mod tests {
             },
         );
 
-        assert_generator_called![units, define_gen];
+        assert_generator_called![units, define_gen(1)];
     }
 
     #[test]
@@ -643,6 +640,6 @@ mod tests {
                 },
             );
 
-        assert_generator_called![units, define_value_gen];
+        assert_generator_called![units, define_value_gen(1)];
     }
 }
