@@ -43,8 +43,8 @@ before_script:
   - echo "Installing cargo-kcov"
   - cargo install cargo-kcov 2>/dev/null || echo "cargo-kcov already installed"
 
-  # Install clippy
-  - rustup component add clippy
+  # Install clippy (or do nothing for nightly channel)
+  - rustup component add clippy || true
   
 script:
   - |
