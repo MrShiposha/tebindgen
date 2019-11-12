@@ -23,7 +23,7 @@ before_script:
   - rustup component add clippy || true
 
 matrix:
-  - include:
+  include:
     - rust:
       - stable
       - beta
