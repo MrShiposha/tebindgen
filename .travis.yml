@@ -43,26 +43,27 @@ before_script:
   - rustup component add clippy || true
 
 matrix:
-  - os: linux
-    rust: 
-      - stable
-      - beta
-    dist: trusty
-    sudo: required
-    script:
-      - |
-          cargo build &&
-          cargo test
-      - cargo clippy
+  include:
+    - os: linux
+      rust: 
+        - stable
+        - beta
+      dist: trusty
+      sudo: required
+      script:
+        - |
+            cargo build &&
+            cargo test
+        - cargo clippy
 
-  - os: linux
-    rust: nightly
-    dist: trusty
-    sudo: required
-    script:
-      - |
-          cargo build &&
-          cargo test
+    - os: linux
+      rust: nightly
+      dist: trusty
+      sudo: required
+      script:
+        - |
+            cargo build &&
+            cargo test
     
 after_success:
   - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
