@@ -37,11 +37,15 @@ matrix:
         - cargo clippy
 
     - rust: nightly
+      before_script:
+        - rustup component add clippy --toolchain nightly
+        - rustup component add rustfmt --toolchain nightly
       script:
-        - cargo fmt -- --check
+        - cargo +nightly fmt -- --check
         - |
             cargo build &&
             cargo test
+        - cargo +nightly clippy
           
 after_success:
   - cargo kcov --coveralls --lib --no-clean-rebuild -- --exclude-pattern=$HOME/.cargo
