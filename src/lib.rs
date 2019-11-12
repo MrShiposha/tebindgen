@@ -279,7 +279,7 @@ impl Generator {
                         ir::StructField::new(child.get_name().unwrap(), child.get_type().unwrap());
 
                     fields.push(field);
-                },
+                }
                 _ => {}
             }
         }
@@ -613,7 +613,7 @@ mod tests {
 
         assert!(generator.arguments.is_empty());
         generator.c_flags(&["some_flag1", "some_flag2"]);
-        
+
         assert!(!generator.arguments.is_empty());
         assert_eq!(generator.arguments[0], "some_flag1");
         assert_eq!(generator.arguments[1], "some_flag2");
