@@ -18,10 +18,9 @@ rust:
   - beta
   - nightly
 before_install:
-  - ls $HOME 
-  - bash $HOME/ci/travis/before_install.sh
+  - bash $TRAVIS_BUILD_DIR/ci/travis/before_install.sh
 before_script:
-  - bash $HOME/ci/travis/install.sh
+  - bash $TRAVIS_BUILD_DIR/ci/travis/install.sh
 script:
   - |
       cargo build &&
